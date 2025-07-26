@@ -1,7 +1,0 @@
-ai:
-  API_KEY: sk-ChCzqxK2bcjznVVg3e571b93Dd9d4bE798631a7bB4770fFf
-  BASE_URL: https://one.aiskt.com/v1
-  system: 你是ChatGPT，一个由OpenAI训练的大语言模型。在你的回答中不能包含任何markdown字符，回答内容要尽量简短，不超过100字
-  model: gpt-4o-mini
-voice:
-  API_KEY: sk-b1219688fba649c78346f25777e64b23
