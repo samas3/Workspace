@@ -287,7 +287,7 @@ class SystemManager:
         
         print("✅ 资源清理完成")
 
-def main():
+def func():
     """主函数"""
     print("🚀 系统启动脚本开始运行...")
     print(f"⏰ 启动时间: {time.strftime('%Y-%m-%d %H:%M:%S')}")
@@ -322,9 +322,9 @@ def main():
         print(f"❌ 运行时错误: {e}")
     
     finally:
-        main.main()
         system.cleanup()
         print("👋 程序结束")
+        # main.main()
 
 if __name__ == "__main__":
-    main()
+    func()

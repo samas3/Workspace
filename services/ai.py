@@ -1,35 +1,75 @@
-from openai import OpenAI
+import requests
+
 class AI:
     def __init__(self, API_KEY, BASE_URL, system=None, model='gpt-4o-mini'):
         self.API_KEY = API_KEY
         self.BASE_URL = BASE_URL
         self.system = system
         self.messages = []
-        self.ai = OpenAI(api_key=API_KEY, base_url=BASE_URL)
         self.model = model
         if system:
             self.init_system()
+    
     def set_model(self, model):
         self.model = model
+    
     def get_models(self):
-        response = self.client.models.list()
-        models = [model.id for model in response.data]
-        return models
+        headers = {
+            'Authorization': f'Bearer {self.API_KEY}',
+            'Content-Type': 'application/json'
+        }
+        try:
+            response = requests.get(f'{self.BASE_URL}/models', headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            models = [model['id'] for model in data['data']]
+            return models
+        except Exception as e:
+            print(f"Error getting models: {e}")
+            return []
+    
     def init_system(self, max_tokens=2000, temperature=0.7):
         self.messages.append({'role': 'system', 'content': self.system})
-        try:
-            res = self.ai.chat.completions.create(model=self.model, messages=self.messages, temperature=temperature, max_tokens=max_tokens)
-        except Exception as e:
-            print(e)
+        self._get_completion(max_tokens=max_tokens, temperature=temperature)
+    
     def get_response(self, message):
         self.messages.append({'role': 'user', 'content': message})
+        response_content = self._get_completion()
+        if response_content:
+            self.messages.append({'role': 'assistant', 'content': response_content})
+            return response_content
+        return None
+    
+    def _get_completion(self, max_tokens=2000, temperature=0.7):
+        headers = {
+            'Authorization': f'Bearer {self.API_KEY}',
+            'Content-Type': 'application/json'
+        }
+        
+        payload = {
+            'model': self.model,
+            'messages': self.messages,
+            'temperature': temperature,
+            'max_tokens': max_tokens
+        }
+        
         try:
-            res = self.ai.chat.completions.create(model=self.model, messages=self.messages, temperature=0.7, max_tokens=2000)
+            response = requests.post(
+                f'{self.BASE_URL}/chat/completions',
+                headers=headers,
+                json=payload,
+                timeout=30
+            )
+            response.raise_for_status()
+            data = response.json()
+            return data['choices'][0]['message']['content']
+        except requests.exceptions.RequestException as e:
+            print(f"Request error: {e}")
+        except KeyError as e:
+            print(f"Response format error: {e}")
         except Exception as e:
-            print(e)
-        else:
-            self.messages.append(res.choices[0].message.content)
-            return res.choices[0].message.content
+            print(f"Unexpected error: {e}")
+        return None
 
 if __name__ == '__main__':
     import voice

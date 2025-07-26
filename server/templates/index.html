@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>语音指令</title>
+    <title>控制台</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -158,6 +158,12 @@
         <div class="result" id="result">
             <div><strong>AI回答:</strong> <span id="ai-response"></span></div>
         </div>
+    </div>
+    <div>
+        <button id="forward">前进</button>
+        <button id="backward">后退</button>
+        <button id="left">左转</button>
+        <button id="right">右转</button>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>

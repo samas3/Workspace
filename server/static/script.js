@@ -1,3 +1,5 @@
+const $ = (i) => document.getElementById(i);
+
 class VoiceRecognitionApp {
     constructor() {
         this.isRecording = false;
@@ -222,4 +224,17 @@ class VoiceRecognitionApp {
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
     new VoiceRecognitionApp();
+});
+
+$('forward').addEventListener('click', () => {
+    fetch('/move_forward', { method: 'POST' });
+});
+$('backward').addEventListener('click', () => {
+    fetch('/move_backward', { method: 'POST' });
+});
+$('left').addEventListener('click', () => {
+    fetch('/turn_left', { method: 'POST' });
+});
+$('right').addEventListener('click', () => {
+    fetch('/turn_right', { method: 'POST' });
 });

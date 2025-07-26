@@ -52,6 +52,9 @@ try:
 except Exception as e:
     print('❌ 初始化硬件失败:', e)
     print('LED, LCD, PWM, DistanceSensor 未初始化')
+else:
+    print('✅ 硬件初始化成功')
+    print('LED, LCD, PWM, DistanceSensor 已初始化')
 ina219 = INA219.INA219(addr=0x42)
 board = Board(1, 0x10)    # RaspberryPi select bus 1, set address to 0x10
 
@@ -210,3 +213,16 @@ def get_battery():
     # print("Power:         {:6.3f} W".format(power))                 # 打印功率
     # print("Percent:       {:3.1f}%".format(p))                      # 打印映射后的百分比数值
     return bus_voltage, current/1000, power, p
+def cleanup():
+    """清理资源"""
+    print("\n🧹 正在清理资源...")
+    
+    if led:
+        led.close()
+    
+    if pwm:
+        pwm.close()
+    # if disp:
+    #     disp.reset()
+    # if sensor:
+    #     sensor.close()
