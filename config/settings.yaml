@@ -1,0 +1,8 @@
+ai:
+  API_KEY: sk-ChCzqxK2bcjznVVg3e571b93Dd9d4bE798631a7bB4770fFf
+  BASE_URL: https://one.aiskt.com/v1
+  system: 你是视觉障碍者的帮手，需要及时简洁清晰地回答他们的问题，语气有亲和力。用清楚的中文回答问题，在你的回答中不能包含任何markdown字符。
+  model: gpt-4o-mini
+voice:
+  # API_KEY: sk-b1219688fba649c78346f25777e64b23
+  API_KEY: sk-da685c1884eb4d1b8b3e5320cc7324d4
