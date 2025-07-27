@@ -3,12 +3,11 @@
 from ultralytics import YOLO
 import cv2
 import time
-
+from utils import util
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from services import voice
-from utils import util
 from hardware import motor_control
 motor = motor_control.MotorController()
 # 加载 YOLOv8 模型
@@ -107,8 +106,9 @@ translation = {
     'hair drier': '吹风机',
     'toothbrush': '牙刷'
 }
-target = 'person'
+target = 'car'
 def main():
+    over = False
     while True:
         # 读取摄像头画面
         ret, frame = cap.read()
@@ -116,9 +116,18 @@ def main():
             print("❌ 无法读取摄像头画面")
             break
         # 使用 YOLOv8 进行目标检测
-        results = model(frame, conf=0.4)  # conf 是置信度阈值
+        results = model(frame, conf=0.6)  # conf 是置信度阈值
         # 获取图片的宽度和高度
         height, width = frame.shape[:2]
+        tags = [result.names[int(box.cls[0])] for result in results for box in result.boxes]
+        if target not in tags:
+            motor.right(0.05)
+            over = True
+            time.sleep(0.5)
+            continue
+        if over:
+            motor.left(0.15)
+            over = False
         # 遍历检测结果
         for result in results:
             for box in result.boxes:
@@ -138,12 +147,19 @@ def main():
                     x_position = "正前方"
 
                 # 判断物体距离（垂直方向）
-                if center_y < height / 3 * 1:
-                    y_position = "近处"
-                elif center_y > height / 3 * 2:
+                # if center_y < height / 3 * 1:
+                #     y_position = "近处"
+                # elif center_y > height / 3 * 2:
+                #     y_position = "远处"
+                # else:
+                #     y_position = "中距离"
+
+                if abs(y2 - y1) < height / 3:
                     y_position = "远处"
-                else:
+                elif abs(y2 - y1) < height / 2:
                     y_position = "中距离"
+                else:
+                    y_position = "近处"
 
                 # 获取类别名称和置信度
                 class_id = int(box.cls[0])
@@ -158,14 +174,23 @@ def main():
                 #     time.sleep(0.5)
                 if class_name == target and y_position != '近处':
                     if x_position == '正前方':
+                        motor.stop()
                         motor.forward(0.5)
                         print('前进')
                     elif x_position == '左前方':
-                        motor.left(0.5)
+                        motor.left(0.05)
+                        motor.forward(0.3)
                         print('左转')
                     elif x_position == '右前方':
-                        motor.right(0.5)
+                        motor.right(0.05)
+                        motor.forward(0.3)
                         print('右转')
+                if class_name == target and y_position == '近处':
+                    motor.stop()
+                    print('停止')
+                    tts.speak(info)
+                    util.play_audio('media/output.wav')
+                    time.sleep(0.5)
                 print(info)
 
         # 显示检测结果
